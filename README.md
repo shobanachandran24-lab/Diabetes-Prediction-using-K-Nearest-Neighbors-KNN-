@@ -1,113 +1,167 @@
 # Diabetes Prediction using K-Nearest Neighbors (KNN)
 
-> A machine learning project that predicts whether a patient has diabetes from diagnostic measurements, using a KNN classifier and comparing it with Logistic Regression.
+## Project Description
 
-## Description
+This project predicts whether a person has diabetes based on medical measurements. It uses the **Pima Indians Diabetes dataset** (`diabetes.csv`) and builds a **K-Nearest Neighbors (KNN) classifier** in a Jupyter Notebook (`KNN_Regression.ipynb`). A **Logistic Regression** model is then built on the same data as a second model.
 
-This project uses the **Pima Indians Diabetes dataset** to predict the onset of diabetes (`Outcome`: 1 = diabetic, 0 = non-diabetic) from eight medical features such as glucose level, BMI, age and insulin.
+The target is binary: **1 = the person has diabetes, 0 = the person does not**.
 
-The notebook walks through a complete beginner-friendly ML workflow:
+## Files in the Project
 
-1. Loading and inspecting the data (shape, types, missing values, duplicates)
-2. Selecting features and the target variable
-3. Splitting the data into training (80%) and testing (20%) sets
-4. Tuning `k` for KNN by comparing train vs. test accuracy for k = 1 to 10
-5. Building the final KNN model (k = 6) and making predictions
-6. Evaluating with accuracy, precision, recall, F1-score, a confusion matrix and a classification report
-7. Training a second model (Logistic Regression) for comparison
-
-> **Note:** Although the notebook file is named `KNN_Regression.ipynb`, the task is **binary classification** (the target is 0/1), so it uses `KNeighborsClassifier`, not a regression model.
-
-## Project Structure
-
-```
-.
-├── KNN_Regression.ipynb   # Main notebook (analysis, modeling, evaluation)
-├── diabetes.csv           # Dataset (768 rows, 9 columns)
-└── README.md
-```
-
-## Dataset
-
-| Property | Value |
+| File | Purpose |
 |---|---|
-| Rows | 768 patients |
-| Features | 8 numeric columns |
-| Target | `Outcome` (0 = no diabetes, 1 = diabetes) |
-| Class balance | 500 non-diabetic (65.1%), 268 diabetic (34.9%) |
-| Missing values / duplicates | None |
+| `diabetes.csv` | The dataset: 768 patient records, 9 columns |
+| `KNN_Regression.ipynb` | The notebook with all the code: data checking, splitting, KNN, evaluation and Logistic Regression |
+| `README.md` | This documentation |
 
-**Features**
+## About the Data
 
-| Feature | Description |
+The dataset has **768 rows** (patients) and **9 columns**: 8 input features and 1 target column. All values are numeric. There are **no missing values** and **no duplicate rows**.
+
+### Columns
+
+| Column | Type | Meaning | Min | Mean | Max |
+|---|---|---|---|---|---|
+| `Pregnancies` | int | Number of times pregnant | 0 | 3.85 | 17 |
+| `Glucose` | int | Plasma glucose concentration | 0 | 120.89 | 199 |
+| `BloodPressure` | int | Diastolic blood pressure (mm Hg) | 0 | 69.11 | 122 |
+| `SkinThickness` | int | Triceps skin-fold thickness (mm) | 0 | 20.54 | 99 |
+| `Insulin` | int | 2-hour serum insulin (mu U/ml) | 0 | 79.80 | 846 |
+| `BMI` | float | Body mass index | 0 | 31.99 | 67.1 |
+| `DiabetesPedigreeFunction` | float | Score of diabetes family history | 0.08 | 0.47 | 2.42 |
+| `Age` | int | Age in years | 21 | 33.24 | 81 |
+| `Outcome` | int | **Target**: 0 = no diabetes, 1 = diabetes | 0 | 0.35 | 1 |
+
+### Target distribution
+
+| Outcome | Count | Share |
+|---|---|---|
+| 0 (no diabetes) | 500 | 65.1% |
+| 1 (diabetes) | 268 | 34.9% |
+
+## What Was Done in the Project (Step by Step)
+
+### 1. Import libraries
+NumPy, Pandas, Matplotlib and Seaborn were imported, and warnings were turned off.
+
+### 2. Load the data
+`diabetes.csv` was read into a Pandas DataFrame called `df`.
+
+### 3. Understand and check the data
+The following checks were run:
+- `df.head()` to view the first rows
+- `df.shape` to get the size (768 rows, 9 columns)
+- `df.info()` and `df.dtypes` to see the column types
+- `df.isnull().sum()` to count missing values (result: none)
+- `df.duplicated().sum()` to count duplicate rows (result: none)
+
+### 4. Define features and target
+- **Features (x):** Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age
+- **Target (y):** Outcome
+
+### 5. Split into training and testing sets
+`train_test_split` was used with `test_size=0.2` and `random_state=42`:
+- Training set: 614 rows (80%)
+- Testing set: 154 rows (20%), of which 99 are non-diabetic and 55 are diabetic
+
+### 6. Find a suitable value of k
+A KNN classifier was trained for every k from 1 to 10. For each k, the accuracy was calculated on both the training data and the testing data. The results were plotted twice as line graphs (accuracy against k).
+
+| k | Train accuracy | Test accuracy |
+|---|---|---|
+| 1 | 1.000 | 0.675 |
+| 2 | 0.832 | 0.701 |
+| 3 | 0.855 | 0.649 |
+| 4 | 0.809 | 0.708 |
+| 5 | 0.798 | 0.662 |
+| 6 | 0.788 | 0.727 |
+| 7 | 0.793 | 0.688 |
+| 8 | 0.777 | 0.747 |
+| 9 | 0.793 | 0.721 |
+| 10 | 0.790 | 0.766 |
+
+### 7. Build the final KNN model
+The final model is `KNeighborsClassifier(n_neighbors=6)` (the scikit-learn default is 5, and this project uses 6). It was trained on the training set.
+
+### 8. Make predictions
+The model predicted the Outcome for the test set, and the first five predictions were compared with the first five actual values.
+
+### 9. Evaluate the KNN model
+The test set predictions were evaluated with accuracy, precision, recall, F1-score, a confusion matrix (drawn as a Seaborn heatmap) and a classification report.
+
+| Metric | Value |
 |---|---|
-| `Pregnancies` | Number of times pregnant |
-| `Glucose` | Plasma glucose concentration |
-| `BloodPressure` | Diastolic blood pressure (mm Hg) |
-| `SkinThickness` | Triceps skin fold thickness (mm) |
-| `Insulin` | 2-hour serum insulin (mu U/ml) |
-| `BMI` | Body mass index |
-| `DiabetesPedigreeFunction` | Diabetes family-history score |
-| `Age` | Age in years |
+| Accuracy | 0.727 |
+| Precision | 0.633 |
+| Recall | 0.564 |
+| F1-score | 0.596 |
 
-**Data quality note:** several columns contain `0` where a zero is not physiologically possible, which usually means a missing value (Glucose: 5, BloodPressure: 35, SkinThickness: 227, Insulin: 374, BMI: 11). The current notebook does not treat these, which is a good area for improvement (see below).
+Confusion matrix (rows = actual, columns = predicted):
 
-## Technologies Used
+| | Predicted 0 | Predicted 1 |
+|---|---|---|
+| **Actual 0** | 81 | 18 |
+| **Actual 1** | 24 | 31 |
 
-- Python 3
-- NumPy, Pandas
-- Matplotlib, Seaborn
-- Scikit-learn
+Classification report:
 
-## Getting Started
+| Class | Precision | Recall | F1-score | Support |
+|---|---|---|---|---|
+| 0 (no diabetes) | 0.77 | 0.82 | 0.79 | 99 |
+| 1 (diabetes) | 0.63 | 0.56 | 0.60 | 55 |
+| Accuracy | | | 0.73 | 154 |
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd <your-repo-folder>
-   ```
+### 10. Model 2: Logistic Regression
+A `LogisticRegression` model was trained on the same training data and tested on the same test data. Its score, confusion matrix, precision and classification report were produced.
 
-2. **Install dependencies**
-   ```bash
-   pip install numpy pandas matplotlib seaborn scikit-learn jupyter
-   ```
+| Metric | Value |
+|---|---|
+| Accuracy | 0.747 |
+| Precision | 0.638 |
+| Recall | 0.673 |
+| F1-score | 0.655 |
 
-3. **Run the notebook**
-   ```bash
-   jupyter notebook KNN_Regression.ipynb
-   ```
-   Make sure `diabetes.csv` is in the same folder as the notebook.
+Confusion matrix (rows = actual, columns = predicted):
 
-## Models and Results
+| | Predicted 0 | Predicted 1 |
+|---|---|---|
+| **Actual 0** | 78 | 21 |
+| **Actual 1** | 18 | 37 |
 
-Both models were evaluated on the same 20% hold-out test set (154 samples, `random_state=42`).
+Classification report:
+
+| Class | Precision | Recall | F1-score | Support |
+|---|---|---|---|---|
+| 0 (no diabetes) | 0.81 | 0.79 | 0.80 | 99 |
+| 1 (diabetes) | 0.64 | 0.67 | 0.65 | 55 |
+| Accuracy | | | 0.75 | 154 |
+
+## Results Summary
 
 | Model | Accuracy | Precision | Recall | F1-score |
 |---|---|---|---|---|
 | KNN (k = 6) | 0.727 | 0.633 | 0.564 | 0.596 |
 | Logistic Regression | 0.747 | 0.638 | 0.673 | 0.655 |
 
-Logistic Regression performs slightly better overall, mainly with higher recall, meaning it misses fewer diabetic patients. In a medical screening setting, recall is usually the metric that matters most.
+Both models were tested on the same 154 test samples. Logistic Regression scored slightly higher on all four metrics.
 
-**Choosing k:** with k = 1 the model memorizes the training data (100% train accuracy, about 67.5% test accuracy), which is classic overfitting. Test accuracy changes noticeably from one k to the next, so a more robust choice of `k` would use cross-validation.
+## Technologies Used
 
-## Possible Improvements
+- Python 3
+- NumPy and Pandas (data handling)
+- Matplotlib and Seaborn (graphs and heatmap)
+- Scikit-learn (train/test split, KNN, Logistic Regression, metrics)
+- Jupyter Notebook
 
-- **Scale the features** (e.g. `StandardScaler`). KNN is distance-based, so features with large ranges like Insulin and Glucose dominate the distance calculation.
-- **Handle the invalid zeros** by replacing them with the median or using imputation.
-- **Use cross-validation and `GridSearchCV`** to choose `k`, distance metric and weighting instead of a single train/test split.
-- **Address class imbalance** with stratified splitting (`stratify=y`) or class weights.
-- Try other models such as Random Forest, SVM or Gradient Boosting.
-- Report ROC-AUC alongside the other metrics.
+## How to Run
 
-## Disclaimer
+```bash
+pip install numpy pandas matplotlib seaborn scikit-learn jupyter
+jupyter notebook KNN_Regression.ipynb
+```
 
-This project is for learning and demonstration purposes only. It is not a medical tool and must not be used for real diagnosis or treatment decisions.
+Keep `diabetes.csv` in the same folder as the notebook.
 
-## Acknowledgements
+## Dataset Source
 
-Dataset: Pima Indians Diabetes Database, originally from the National Institute of Diabetes and Digestive and Kidney Diseases (available on Kaggle and the UCI Machine Learning Repository).
-
-## License
-
-Add your preferred license here (for example, MIT).
+Pima Indians Diabetes Database, from the National Institute of Diabetes and Digestive and Kidney Diseases (available on Kaggle and the UCI Machine Learning Repository).
